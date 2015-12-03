@@ -1,5 +1,9 @@
-Minimalistic AKKA actor-controlled embedded OrientDB server
+[![Build Status](https://travis-ci.org/jurajzachar/orientdb-embedded.svg?branch=master)](https://travis-ci.org/jurajzachar/orientdb-embedded)
+
+Minimalistic AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Embedded-Server.html) 
 ===========================================================
+
+> See project/Build.scala for OrientDb version used.
 
 1. Create application.conf
 --------------------------
