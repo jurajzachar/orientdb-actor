@@ -7,13 +7,14 @@ import org.scalatest.Matchers
 import org.scalatest.WordSpecLike
 import org.slf4j.LoggerFactory
 import com.blueskiron.orientdb.embedded.actor.ServerActor
-import com.blueskiron.orientdb.embedded.api.EmbeddedService._
+import com.blueskiron.orientdb.embedded.api.EmbeddedOrientDb._
 import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.testkit.DefaultTimeout
 import akka.testkit.ImplicitSender
 import akka.testkit.TestKit
 import scala.io.Source
+import com.typesafe.config.ConfigFactory
 
 class EmbeddedServiceSpec(testSystem: ActorSystem)
     extends TestKit(testSystem)
@@ -21,29 +22,29 @@ class EmbeddedServiceSpec(testSystem: ActorSystem)
     with WordSpecLike with Matchers with BeforeAndAfterAll {
 
   def this() = this(ActorSystem("EmbeddedSpec"))
-  
+
   private val log = LoggerFactory.getLogger(getClass)
-  
+
   private val defaultTimeout = 10 seconds
-  lazy val props = Props(classOf[ServerActor], getClass.getResourceAsStream("/config/orientdb-server-config.xml"), "test-node")
+  lazy val props = Props(classOf[ServerActor], ConfigFactory.load().getConfig("orientdb-embedded"))
   lazy val orientDbServiceRef = testSystem.actorOf(props, name = "orientDbService")
-  
+
   override def beforeAll {
-      log.info("actor created: ", orientDbServiceRef)
+    log.info("actor created: ", orientDbServiceRef)
   }
 
   override def afterAll {
     orientDbServiceRef ! Shutdown
     TestKit.shutdownActorSystem(testSystem)
   }
-  
-  "EmbeddedService" must {
-    "be active after 'Activate' message is received" in {
-       orientDbServiceRef ! Activate
-       expectMsgPF(defaultTimeout) {
-         case false => fail("failed to activate")
-         case true => //ignore
-       }
+
+  "Embedded OrientDB server" must {
+    "be active after 'IsActivate' message is sent to it" in {
+      orientDbServiceRef ! IsActive
+      expectMsgPF(defaultTimeout) {
+        case false => fail("failed to bring up the server")
+        case true  => //ignore
+      }
     }
   }
 

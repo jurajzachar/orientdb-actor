@@ -55,6 +55,6 @@ object Dependencies {
 
   // Project deps
   val all = 
-    Seq(orientDbEnterprise, orientDbServer, orientDbCore, orientDbGraphdb, orientDbDistributed, orientDbTools) ++ Seq(akkaActor, akkaRemote, akkaLog, akkaTestkit % Test, scalaTest % Test) ++ Seq(logbackCore % Test, logbackClassic % Test)
+    Seq(orientDbEnterprise, orientDbServer, orientDbCore, orientDbGraphdb, orientDbDistributed, orientDbTools) ++ Seq(akkaActor, akkaLog, akkaRemote % Test, akkaTestkit % Test, scalaTest % Test) ++ Seq(logbackCore % Test, logbackClassic % Test)
 
 }

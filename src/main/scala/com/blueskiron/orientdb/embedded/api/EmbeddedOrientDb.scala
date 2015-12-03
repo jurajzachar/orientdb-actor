@@ -4,13 +4,13 @@ package com.blueskiron.orientdb.embedded.api
  * @author juri
  *
  */
-object EmbeddedService {
+object EmbeddedOrientDb {
 
   /**
-   * activates embedded server
+   * check is the embedded server is active
    *
    */
-  case object Activate
+  case object IsActive
 
   /**
    * shutdowns embedded server
