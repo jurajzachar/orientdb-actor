@@ -11,11 +11,15 @@ object EmbeddedService {
    *
    */
   case object Activate
- 
+
   /**
    * shutdowns embedded server
    *
    */
   case object Shutdown
-
+  
+  /**
+   * lists available databases
+   */
+  case object ListDatabases
 }

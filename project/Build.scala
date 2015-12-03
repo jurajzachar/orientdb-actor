@@ -33,14 +33,17 @@ object Dependencies {
 
   // Versions
   object Version {
+    val logback = "1.1.3"
     val akka = "2.4.0"
     val orientDb = "2.1.6"
   }
 
   // Libraries
-  //val specs2core = "org.specs2" %% "specs2-core" % "2.4.14"
+  val logbackCore = "ch.qos.logback" % "logback-core" % Version.logback
+  val logbackClassic = "ch.qos.logback" % "logback-classic" % Version.logback
   val scalaTest = "org.scalatest" % "scalatest_2.11" % "2.2.4"
   val akkaActor = "com.typesafe.akka" %% "akka-actor" % Version.akka
+  val akkaRemote = "com.typesafe.akka" %% "akka-remote" % Version.akka
   val akkaLog = "com.typesafe.akka" %% "akka-slf4j" % Version.akka
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % Version.akka
   val orientDbEnterprise = "com.orientechnologies" % "orientdb-enterprise" % Version.orientDb
@@ -51,6 +54,7 @@ object Dependencies {
   val orientDbDistributed = "com.orientechnologies" % "orientdb-distributed" % Version.orientDb withJavadoc ()
 
   // Project deps
-  val all = Seq(orientDbEnterprise, orientDbServer, orientDbCore, orientDbGraphdb, orientDbDistributed, orientDbTools) ++ Seq(akkaActor, akkaLog, akkaTestkit % Test, scalaTest % Test)
+  val all = 
+    Seq(orientDbEnterprise, orientDbServer, orientDbCore, orientDbGraphdb, orientDbDistributed, orientDbTools) ++ Seq(akkaActor, akkaRemote, akkaLog, akkaTestkit % Test, scalaTest % Test) ++ Seq(logbackCore % Test, logbackClassic % Test)
 
 }
