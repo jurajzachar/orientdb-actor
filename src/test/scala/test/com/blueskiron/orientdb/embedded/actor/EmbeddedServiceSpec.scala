@@ -25,7 +25,7 @@ class EmbeddedServiceSpec(testSystem: ActorSystem)
 
   private val log = LoggerFactory.getLogger(getClass)
 
-  private val defaultTimeout = 10 seconds
+  private val defaultTimeout = 25 seconds
   lazy val props = Props(classOf[ServerActor], ConfigFactory.load().getConfig("orientdb-embedded"))
   lazy val orientDbServiceRef = testSystem.actorOf(props, name = "orientDbService")
 
