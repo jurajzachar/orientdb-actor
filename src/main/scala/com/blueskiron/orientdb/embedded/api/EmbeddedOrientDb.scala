@@ -5,7 +5,19 @@ package com.blueskiron.orientdb.embedded.api
  *
  */
 object EmbeddedOrientDb {
+  
+  private val nameSpace = "orientdb"
+  val serverConfigKey = nameSpace + "-" + "server-config";
+  val homeKey = nameSpace + "-" + "home";
+  val nodeNameKey = nameSpace + "-" + "node-name";
+  val rootPasswordKey = nameSpace + "-" + "root-password";
 
+  /**
+   * start up embedded server
+   *
+   */
+  case object StartUp
+  
   /**
    * check is the embedded server is active
    *
@@ -21,5 +33,5 @@ object EmbeddedOrientDb {
   /**
    * lists available databases
    */
-  case object ListDatabases
+  case class ListDatabases(result: Map[String, String])
 }

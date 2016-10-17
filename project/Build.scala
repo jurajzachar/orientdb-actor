@@ -5,12 +5,12 @@ import Tests._
 object OrientDBEmbedded extends Build {
 
   lazy val projectSettings = Seq(
-    version := "0.1.0",
+    version := "1.0.0",
     organizationName := "Blue Skiron",
     organization := "com.blueskiron",
     name := "orientdb-embedded",
     logBuffered := false,
-    scalaVersion := "2.11.7",
+    scalaVersion := "2.11.8",
     scalacOptions := Seq(
       "-target:jvm-1.8",
       "-encoding", "UTF-8",
@@ -34,8 +34,8 @@ object Dependencies {
   // Versions
   object Version {
     val logback = "1.1.3"
-    val akka = "2.4.0"
-    val orientDb = "2.1.6"
+    val akka = "2.4.11"
+    val orientDb = "2.2.10"
   }
 
   // Libraries
@@ -46,7 +46,7 @@ object Dependencies {
   val akkaRemote = "com.typesafe.akka" %% "akka-remote" % Version.akka
   val akkaLog = "com.typesafe.akka" %% "akka-slf4j" % Version.akka
   val akkaTestkit = "com.typesafe.akka" %% "akka-testkit" % Version.akka
-  val orientDbEnterprise = "com.orientechnologies" % "orientdb-enterprise" % Version.orientDb
+  val orientDbEnterprise = "com.orientechnologies" % "orientdb-enterprise" % "2.2.0-beta" //wtf?
   val orientDbServer = "com.orientechnologies" % "orientdb-server" % Version.orientDb
   val orientDbCore = "com.orientechnologies" % "orientdb-core" % Version.orientDb
   val orientDbTools = "com.orientechnologies" % "orientdb-tools" % Version.orientDb

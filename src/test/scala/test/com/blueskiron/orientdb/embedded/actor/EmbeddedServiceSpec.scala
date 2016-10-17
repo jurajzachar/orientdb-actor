@@ -39,11 +39,25 @@ class EmbeddedServiceSpec(testSystem: ActorSystem)
   }
 
   "Embedded OrientDB server" must {
-    "be active after 'IsActivate' message is sent to it" in {
+    "be active when " + StartUp +" message is sent to it" in {
+      orientDbServiceRef ! StartUp
       orientDbServiceRef ! IsActive
       expectMsgPF(defaultTimeout) {
         case false => fail("failed to bring up the server")
-        case true  => //ignore
+        case true  => {
+          log.info("Received confirmation OrientDB server is active!")
+        }
+      }
+    }
+  }
+  
+  "Embedded OrientDB server" must {
+    "list all available databases when " + ListDatabases + " message is sent to it" in {
+      orientDbServiceRef ! ListDatabases
+      expectMsgPF(defaultTimeout) {
+        case response  => {
+          log.info("Received {} response to message {}", response, ListDatabases)
+        }
       }
     }
   }
