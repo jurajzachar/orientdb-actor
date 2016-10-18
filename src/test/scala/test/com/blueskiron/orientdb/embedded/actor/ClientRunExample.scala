@@ -18,20 +18,26 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object ClientRun extends App {
+object ClientRunExample extends App {
 
   val sys = ActorSystem("client", ConfigFactory.load().getConfig("client"))
-  val serverPath = ActorPath.fromString("akka.tcp://server@127.0.0.1:2551/user/odbService")
+  val serverPath = ActorPath.fromString("akka.tcp://example-system@127.0.0.1:2551/user/OrientDbServerActor")
   val server = sys.actorSelection(serverPath)
   
   implicit val timeout = Timeout(10 seconds)
   
+  //tell server to startUp
+  server ! StartUp
+  
   val isActive = Await.result(server ? IsActive,  timeout.duration).asInstanceOf[Boolean]
   println("Embedded orientDb is active: " + isActive)
-  val databases = Await.result(server ? ListDatabases, timeout.duration).asInstanceOf[Map[String, String]]
+  
+  val databases = Await.result(server ? ListDatabases, timeout.duration)
   println("List databases: " + databases)
+  
   val isShutDown = Await.result(server ? Shutdown, timeout.duration).asInstanceOf[Boolean]
   println("Server is shutdown")
-  
+ 
+  System.exit(0)
 }
 

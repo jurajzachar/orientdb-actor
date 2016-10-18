@@ -44,8 +44,9 @@ class ServerActor(config: Config) extends Actor with ActorLogging {
     case IsActive      => sender ! server.isActive()
     case ListDatabases => sender ! ListDatabases(server.getAvailableStorageNames.asScala.toMap)
     case Shutdown => {
-      log.info("Shutting down {} embedded instance...", orientDbNodeName)
+      log.info("Shutting down '{}' embedded instance...", orientDbNodeName)
       sender ! server.shutdown()
+      //destroys itself
       context.stop(self)
     }
   }
