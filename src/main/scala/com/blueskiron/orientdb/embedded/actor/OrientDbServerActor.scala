@@ -31,13 +31,13 @@ class ServerActor(config: Config) extends Actor with ActorLogging {
   //update ENV vars, needed by OrientdbServer
   System.setProperty("ORIENTDB_HOME", orientDbHome)
   System.setProperty("ORIENTDB_NODE_NAME", orientDbNodeName)
-  System.setProperty("ORIENTDB_ROOT_PASSWORD", orientDbRootPassword)
-  
+  //System.setProperty("ORIENTDB_ROOT_PASSWORD", orientDbRootPassword)
+
   private val server = OServerMain.create()
     .startup(ios)
 
   def receive = {
-    case StartUp       => {
+    case StartUp => {
       log.info("Starting up {} embedded instance...", orientDbNodeName)
       server.activate()
     }
