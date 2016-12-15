@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jurajzachar/orientdb-embedded.svg?branch=master)](https://travis-ci.org/jurajzachar/orientdb-embedded)
+[![Build Status](https://travis-ci.org/jurajzachar/orientdb-actor.svg?branch=master)](https://travis-ci.org/jurajzachar/orientdb-actor)
 
 Minimalistic AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Embedded-Server.html) 
 ===========================================================
@@ -8,7 +8,7 @@ Minimalistic AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.co
 1. Create application.conf
 --------------------------
 
-	orientdb-embedded { 
+	orientdb-actor { 
 		orient-db-config = "/path/to/config/orientdb-server-config.xml"
 		orient-db-home = "/path/to/orientdb-home/with/databases"
 		orient-db-node-name = odb-node1
