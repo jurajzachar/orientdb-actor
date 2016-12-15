@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/jurajzachar/orientdb-actor.svg?branch=master)](https://travis-ci.org/jurajzachar/orientdb-actor)
 
-Minimalistic AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Embedded-Server.html) 
+AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Embedded-Server.html) 
 ===========================================================
 
 > See project/Build.scala for OrientDb version used.
