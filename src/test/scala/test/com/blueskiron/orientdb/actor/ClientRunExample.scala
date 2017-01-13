@@ -6,7 +6,6 @@ import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 
-import com.blueskiron.orientdb.actor._
 import com.typesafe.config.ConfigFactory
 
 import akka.actor.ActorPath
@@ -17,6 +16,7 @@ import scala.concurrent.duration._
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.ExecutionContext.Implicits.global
+import com.blueskiron.orientdb.actor.{ OServerActorMessage, OServerActor }
 
 object ClientRunExample extends App {
   val config = ConfigFactory.load()
@@ -28,12 +28,12 @@ object ClientRunExample extends App {
   implicit val timeout = Timeout(10 seconds)
 
   //tell server to startUp
-  server ! OServerActor.StartUp
+  server ! OServerActorMessage.StartUp
 
-  val isActive = Await.result(server ? OServerActor.IsActive, timeout.duration).asInstanceOf[Boolean]
+  val isActive = Await.result(server ? OServerActorMessage.ServerStatus, timeout.duration).asInstanceOf[Boolean]
   println("OServerActor is active: " + isActive)
 
-  val databases = Await.result(server ? OServerActor.ListDatabases, timeout.duration)
+  val databases = Await.result(server ? OServerActorMessage.ListDatabases, timeout.duration)
   println("Retrieved from server --> " + databases)
 
   //  val isShutDown = Await.result(server ? Shutdown, timeout.duration).asInstanceOf[Boolean]

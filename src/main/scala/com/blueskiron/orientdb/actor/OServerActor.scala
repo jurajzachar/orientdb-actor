@@ -16,6 +16,7 @@ import scala.io.Codec
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
+import akka.actor.ActorRef
 
 /**
  * @author juri
@@ -33,28 +34,6 @@ object OServerActor {
   def defaultOServerActorname(config: Config) =
     config.getConfig(rootConfigKey).getString(OServerActor.nodeNameKey)
 
-  /**
-   * start up embedded server
-   *
-   */
-  case object StartUp
-
-  /**
-   * check is the embedded server is active
-   *
-   */
-  case object IsActive
-
-  /**
-   * shutdowns embedded server
-   *
-   */
-  case object Shutdown
-
-  /**
-   * lists available databases
-   */
-  case class ListDatabases(result: Map[String, String])
 }
 
 /**
@@ -64,6 +43,7 @@ object OServerActor {
  */
 class OServerActor(config: Config) extends Actor with ActorLogging {
   import OServerActor._
+  import OServerActorMessage._
 
   private val server: OServer = OServerMain.create
 
@@ -82,7 +62,16 @@ class OServerActor(config: Config) extends Actor with ActorLogging {
     }
   }
 
-  override def preStart {
+  override def preStart { boot(context.self) }
+
+  override def postStop { destroy(context.self) }
+
+  private def destroy(requestor: ActorRef) {
+    log.info(s"Shutting down OServer $orientDbNodeName")
+    replyAndPublishEvent(requestor, Shutdown(ServerStatus(orientDbNodeName, server.shutdown())))
+  }
+
+  private def boot(requestor: ActorRef) = {
     //update ENV vars, needed by OrientdbServer
     log.info(s"Setting ORIENTDB_HOME to $orientDbHome")
     System.setProperty("ORIENTDB_HOME", orientDbHome)
@@ -93,36 +82,48 @@ class OServerActor(config: Config) extends Actor with ActorLogging {
     configFile match {
       case Success(config) => {
         log.info("Starting up OrientDB '{}' as embedded instance...", orientDbNodeName)
-        server.startup(config).activate
+        val isActive = server.startup(config).activate.isActive()
+        replyAndPublishEvent(requestor, StartUp(ServerStatus(orientDbNodeName, isActive), None))
       }
-      case Failure(t) => {
-        log.error("Failed to start OrientDB server ", t)
+      case Failure(reason) => {
+        log.error("Failed to start OrientDB server ", reason)
+        replyAndPublishEvent(requestor, StartUp(ServerStatus(orientDbNodeName, server.isActive()), Some(reason)))
         context.unbecome()
       }
     }
   }
 
-  //shutdown OServer when this actor gets destroyed
-  override def postStop {
-    log.info("Shutting down OServer... {}", server.shutdown())
+  private def replyAndPublishEvent(requestor: ActorRef, msg: OServerActorMessage) {
+    requestor ! msg
+    context.system.eventStream.publish(msg)
   }
 
   def receive = {
     case StartUp => {
       if (!server.isActive()) {
-        preStart
+        boot(sender)
       } else {
         log.warning("{} already active", orientDbNodeName)
+        sender ! StartUp(ServerStatus(orientDbNodeName, server.isActive()), None)
       }
     }
-    case IsActive => sender ! server.isActive()
-    case ListDatabases => sender ! ListDatabases(server.getAvailableStorageNames.asScala.toMap)
     case Shutdown => {
-      log.info("Shutting down '{}' embedded instance...", orientDbNodeName)
-      sender ! server.shutdown()
+      if (!server.isActive()) {
+        log.warning("{} already inactive", orientDbNodeName)
+        sender ! StartUp(ServerStatus(orientDbNodeName, server.isActive()), None)
+      } else {
+        destroy(sender)
+      }
     }
+    case ServerStatus                    => sender ! ServerStatus(orientDbNodeName, server.isActive())
+    case ListDatabases                   => sender ! ListDatabases(orientDbNodeName, server.getAvailableStorageNames.asScala.toMap)
+
+    //ignore the startup and shutdown messages
+    case StartUp(status, maybeException) => //ignore...
+    case Shutdown(status)                => //ignore...
+    //should not hit this block
     case msg: Any => {
-      log.warning(s"Unexpected messaged ignored: $msg")
+      log.error(s"Unexpected messaged ignored: $msg")
     }
   }
 

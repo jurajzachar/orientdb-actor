@@ -40,38 +40,34 @@ class OServerActorSpec(testSystem: ActorSystem)
     TestKit.shutdownActorSystem(testSystem)
   }
 
-  "Embedded OrientDB server" must {
-    "be 'active' when " + OServerActor.StartUp + " message is sent to it" in {
-      orientDbServiceRef ! OServerActor.StartUp
-      orientDbServiceRef ! OServerActor.IsActive
+  "OrientDB OServerActor" must {
+    "be 'active' when " + OServerActorMessage.StartUp + " message is sent to it" in {
+      orientDbServiceRef ! OServerActorMessage.StartUp
       expectMsgPF(defaultTimeout) {
-        case false => fail("failed to bring up the server")
-        case true => log.info("Received confirmation OrientDB server is active!")
+        case OServerActorMessage.StartUp(serverStatus, None) if serverStatus.isActive => log.info(s"Received startup confirmation '$serverStatus'!")
+        case OServerActorMessage.StartUp(serverStatus, Some(startProblem)) => fail(startProblem)
+        case _ => fail("failed to bring up the server")
       }
     }
-  }
 
-  "Embedded OrientDB server" must {
-    "be 'shut down' when " + OServerActor.Shutdown + " message is sent to it" in {
-      orientDbServiceRef ! OServerActor.StartUp
-      orientDbServiceRef ! OServerActor.Shutdown
+    "be 'shut down' when " + OServerActorMessage.Shutdown + " message is sent to it" in {
+      orientDbServiceRef ! OServerActorMessage.Shutdown
       expectMsgPF(defaultTimeout) {
-        case false => fail("failed to bring up the server")
-        case true => log.info("Received confirmation OrientDB server is active!")
+        case OServerActorMessage.Shutdown(serverStatus) if serverStatus.isActive => log.info(s"Received shutdown confirmation '$serverStatus'!")
+        case msg: Any => fail(s"failed to bring down the server --> $msg")
       }
-      orientDbServiceRef ! OServerActor.IsActive
+      orientDbServiceRef ! OServerActorMessage.ServerStatus
       expectMsgPF(defaultTimeout) {
-        case false => log.info("Received confirmation OrientDB server is active!")
-        case true => fail("failed to bring up the server")
+        case OServerActorMessage.ServerStatus(orientDbNodeName, isActive) if !isActive => log.info(s"Received confirmation '$orientDbNodeName' server isActive: '$isActive'!")
+        case _ => fail("failed to bring down the server")
       }
     }
-  }
 
-  "Embedded OrientDB server" must {
-    "list all available databases when " + OServerActor.ListDatabases + " message is sent to it" in {
-      orientDbServiceRef ! OServerActor.ListDatabases
+    "list all available databases when " + OServerActorMessage.ListDatabases + " message is sent to it" in {
+      orientDbServiceRef ! OServerActorMessage.ListDatabases
       expectMsgPF(defaultTimeout) {
-        case response => log.info("Received {} response to message {}", response, OServerActor.ListDatabases)
+        case OServerActorMessage.ListDatabases(orientDbNodeName, map) => log.info(s"Received the folowing databases info for '$orientDbNodeName': $map")
+        case _ => fail("failed to query the server")
       }
     }
   }
