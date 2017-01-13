@@ -1,10 +1,9 @@
 import Dependencies._
 
 name := """orientdb-actor"""
-organization in ThisBuild := "Blue Skiron"
-version := "1.0-SNAPSHOT"
+organization in ThisBuild := "com.blueskiron"
+version := "1.0.0"
 
-//handles Java8 lambdas for Gremlin
 scalaVersion := "2.11.8"
 
 lazy val root = (project in file("."))

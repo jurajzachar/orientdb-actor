@@ -7,25 +7,25 @@
                 <parameter value="50" name="graph.pool.max"/>
             </parameters>
         </handler>
-<!--         <handler class="com.orientechnologies.orient.server.hazelcast.OHazelcastPlugin"> -->
-<!--             <parameters> -->
-<!--                 <parameter value="${distributed}" name="enabled"/> -->
-<!--                 <parameter value="${ORIENTDB_HOME}/config/default-distributed-db-config.json" name="configuration.db.default"/> -->
-<!--                 <parameter value="${ORIENTDB_HOME}/config/hazelcast.xml" name="configuration.hazelcast"/> -->
-<!--             </parameters> -->
-<!--         </handler> -->
+        <handler class="com.orientechnologies.orient.server.hazelcast.OHazelcastPlugin">
+            <parameters>
+                <parameter value="${distributed}" name="disabled"/>
+                <parameter value="${ORIENTDB_HOME}/config/default-distributed-db-config.json" name="configuration.db.default"/>
+                <parameter value="${ORIENTDB_HOME}/config/hazelcast.xml" name="configuration.hazelcast"/>
+            </parameters>
+        </handler>
         <handler class="com.orientechnologies.orient.server.handler.OJMXPlugin">
             <parameters>
                 <parameter value="false" name="enabled"/>
                 <parameter value="true" name="profilerManaged"/>
             </parameters>
         </handler>
-<!--         <handler class="com.orientechnologies.orient.server.handler.OAutomaticBackup"> -->
-<!--             <parameters> -->
-<!--                 <parameter value="false" name="enabled"/> -->
-<!--                 <parameter value="${ORIENTDB_HOME}/config/automatic-backup.json" name="config"/> -->
-<!--             </parameters> -->
-<!--         </handler> -->
+        <handler class="com.orientechnologies.orient.server.handler.OAutomaticBackup">
+            <parameters>
+                <parameter value="false" name="enabled"/>
+                <parameter value="${ORIENTDB_HOME}/config/automatic-backup.json" name="config"/>
+            </parameters>
+        </handler>
         <handler class="com.orientechnologies.orient.server.handler.OServerSideScriptInterpreter">
             <parameters>
                 <parameter value="true" name="enabled"/>
@@ -79,13 +79,14 @@
     </network>
     <storages/>
     <users>
-        <user resources="*" password="!ch4ng3m3" name="root"/>
-        <user resources="connect,server.listDatabases,server.dblist" password="guest" name="guest"/>
+        <user resources="*" password="ch4ng3m3!" name="root"/>
+        <user resources="connect,server.listDatabases,server.dblist" password="{PBKDF2WithHmacSHA256}45DAB2A39EB5E5046BBACFD8812CCC3712F9B6759020B1F9:E072491A255A0DCC4D6145E3F5FA6B4142C2FDCE71D9758E:65536" name="guest"/>
     </users>
     <properties>
         <entry value="1" name="db.pool.min"/>
         <entry value="50" name="db.pool.max"/>
         <entry value="false" name="profiler.enabled"/>
+        <entry value="${ORIENTDB_HOME}/databases" name="server.database.path" />
     </properties>
     <isAfterFirstTime>true</isAfterFirstTime>
 </orient-server>

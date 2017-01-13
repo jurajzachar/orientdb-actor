@@ -13,27 +13,33 @@ import com.tinkerpop.blueprints.impls.orient.OrientGraph
 import com.tinkerpop.blueprints.impls.orient.OrientGraphFactory
 import com.tinkerpop.blueprints.impls.orient.OrientVertex
 import com.tinkerpop.blueprints.impls.orient.OrientVertexType
+import scala.collection.JavaConverters._
 
 object OserverAdminExample extends App {
-  val serverAdmin = new OServerAdmin("remote:localhost").connect("root", "!ch4ng3m3")
-  serverAdmin.createDatabase("ScalaSample", "graph", "plocal")
+  val serverAdmin = new OServerAdmin("remote:localhost").connect("root", "ch4ng3m3!")
+  serverAdmin.createDatabase("digital-sympathy", "graph", "plocal")
+}
+
+object CommonGraph {
+  val WorkEdgeLabel = "Work"
+  // opens the DB (if not existing, it will create it)
+  val uri: String = "remote:localhost/digital-sympathy"
+  //val uri: String = "plocal:target/databases/ScalaSample"
+  val factory: OrientGraphFactory = new OrientGraphFactory(uri)
+  val graph: OrientGraph = factory.getTx()
 }
 
 object OrientDbGremlinExample extends App {
-
+  import CommonGraph._
+  //new GremlinPipeline(graph.getVertex(1)).out(WorkEdgeLabel).property("name").filter(new PipeFunction[String, Boolean]() {
+  //  def compute(arg: String): Boolean = arg.startsWith("J")
+  //})
 }
 
 object OrientDbGraphAPIExample extends App {
 
-  import scala.collection.JavaConverters._
+  import CommonGraph._
 
-  val WorkEdgeLabel = "Work"
-
-  // opens the DB (if not existing, it will create it)
-  val uri: String = "remote:localhost/ScalaSample"
-  //val uri: String = "plocal:target/databases/ScalaSample"
-  val factory: OrientGraphFactory = new OrientGraphFactory(uri)
-  val graph: OrientGraph = factory.getTx()
   try {
 
     // if the database does not contain the classes we need (it was just created),

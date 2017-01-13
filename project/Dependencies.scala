@@ -28,8 +28,9 @@ object Dependencies {
   val orientDbEnterprise =  "com.orientechnologies" % "orientdb-enterprise" % "2.2.0-beta" withJavadoc //is this still needed?
   val gremlinGroovy = "com.tinkerpop.gremlin" % "gremlin-groovy" % Version.gremlin
   val gremlinJava = "com.tinkerpop.gremlin" % "gremlin-java" % Version.gremlin
-  //experimental
-  val gremlinScala = "com.michaelpollmeier" %% "gremlin-scala" % "3.2.3.3"
+  //experimental mpollmeier gremlin-scala + orientdb-gremlin (the latter now supported by the Orient team)
+  //val gremlinScala = "com.michaelpollmeier" %% "gremlin-scala" % "3.2.3.3"
+  //val orientDbGremlin = "com.michaelpollmeier" % "orientdb-gremlin" % "3.2.3.0"
 
   val dependencies = Seq(gremlinGroovy, gremlinJava, blueprintsCore, orientDbServer, orientDbClient, orientDbCore, orientDbTools, orientDbGraphdb, orientDbDistributed) ++ Seq(scalactic, akkaActor, akkaLog, akkaRemote)
   val testDependencies = Seq(akkaTestkit % Test, scalaTest % Test, logbackClassic % Test)

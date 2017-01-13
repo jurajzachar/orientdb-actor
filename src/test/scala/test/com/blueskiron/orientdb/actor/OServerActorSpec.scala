@@ -9,7 +9,6 @@ import org.scalatest.WordSpecLike
 import org.slf4j.LoggerFactory
 
 import com.blueskiron.orientdb.actor._
-import com.blueskiron.orientdb.actor.OServerActorMessages._
 import com.typesafe.config.ConfigFactory
 
 import akka.actor.ActorSystem
@@ -19,7 +18,7 @@ import akka.testkit.DefaultTimeout
 import akka.testkit.ImplicitSender
 import akka.testkit.TestKit
 
-class OserverActorSpec(testSystem: ActorSystem)
+class OServerActorSpec(testSystem: ActorSystem)
     extends TestKit(testSystem)
     with DefaultTimeout with ImplicitSender
     with WordSpecLike with Matchers with BeforeAndAfterAll {
@@ -29,11 +28,12 @@ class OserverActorSpec(testSystem: ActorSystem)
   private val log = LoggerFactory.getLogger(getClass)
 
   private val defaultTimeout = 25 seconds
-  lazy val props = Props(classOf[OServerActor], ConfigFactory.load().getConfig("orientdb-actor"))
-  lazy val orientDbServiceRef = testSystem.actorOf(props, name = "OrientDbService")
+  val config = ConfigFactory.load()
+  lazy val props = Props(classOf[OServerActor], config.getConfig("orientdb-actor"))
+  lazy val orientDbServiceRef = testSystem.actorOf(props, name = OServerActor.defaultOServerActorname(config))
 
   override def beforeAll {
-    log.info("Actor created: ", orientDbServiceRef)
+    log.info(s"Actor created: $orientDbServiceRef.path")
   }
 
   override def afterAll {
@@ -41,9 +41,9 @@ class OserverActorSpec(testSystem: ActorSystem)
   }
 
   "Embedded OrientDB server" must {
-    "be 'active' when " + StartUp + " message is sent to it" in {
-      orientDbServiceRef ! StartUp
-      orientDbServiceRef ! IsActive
+    "be 'active' when " + OServerActor.StartUp + " message is sent to it" in {
+      orientDbServiceRef ! OServerActor.StartUp
+      orientDbServiceRef ! OServerActor.IsActive
       expectMsgPF(defaultTimeout) {
         case false => fail("failed to bring up the server")
         case true => log.info("Received confirmation OrientDB server is active!")
@@ -52,14 +52,14 @@ class OserverActorSpec(testSystem: ActorSystem)
   }
 
   "Embedded OrientDB server" must {
-    "be 'shut down' when " + Shutdown + " message is sent to it" in {
-      orientDbServiceRef ! StartUp
-      orientDbServiceRef ! Shutdown
+    "be 'shut down' when " + OServerActor.Shutdown + " message is sent to it" in {
+      orientDbServiceRef ! OServerActor.StartUp
+      orientDbServiceRef ! OServerActor.Shutdown
       expectMsgPF(defaultTimeout) {
         case false => fail("failed to bring up the server")
         case true => log.info("Received confirmation OrientDB server is active!")
       }
-      orientDbServiceRef ! IsActive
+      orientDbServiceRef ! OServerActor.IsActive
       expectMsgPF(defaultTimeout) {
         case false => log.info("Received confirmation OrientDB server is active!")
         case true => fail("failed to bring up the server")
@@ -68,10 +68,10 @@ class OserverActorSpec(testSystem: ActorSystem)
   }
 
   "Embedded OrientDB server" must {
-    "list all available databases when " + ListDatabases + " message is sent to it" in {
-      orientDbServiceRef ! ListDatabases
+    "list all available databases when " + OServerActor.ListDatabases + " message is sent to it" in {
+      orientDbServiceRef ! OServerActor.ListDatabases
       expectMsgPF(defaultTimeout) {
-        case response => log.info("Received {} response to message {}", response, ListDatabases)
+        case response => log.info("Received {} response to message {}", response, OServerActor.ListDatabases)
       }
     }
   }

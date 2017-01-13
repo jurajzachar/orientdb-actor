@@ -21,7 +21,17 @@ import scala.util.Failure
  * @author juri
  *
  */
-object OServerActorMessages {
+object OServerActor {
+  private val nameSpace = "orientdb"
+  val rootConfigKey = nameSpace + "-actor"
+  val serverConfigKey = nameSpace + "-" + "server-config";
+  val homeKey = nameSpace + "-" + "home";
+  val nodeNameKey = nameSpace + "-" + "node-name";
+  val distributedKey = "distributed" //ambiguous, OrientDB breaks naming convention here
+  val rootPasswordKey = nameSpace + "-" + "root-password";
+
+  def defaultOServerActorname(config: Config) =
+    config.getConfig(rootConfigKey).getString(OServerActor.nodeNameKey)
 
   /**
    * start up embedded server
@@ -48,30 +58,18 @@ object OServerActorMessages {
 }
 
 /**
- * @author juri
- *
- */
-object OServerActor {
-  private val nameSpace = "orientdb"
-  val serverConfigKey = nameSpace + "-" + "server-config";
-  val homeKey = nameSpace + "-" + "home";
-  val nodeNameKey = nameSpace + "-" + "node-name";
-  val rootPasswordKey = nameSpace + "-" + "root-password";
-}
-
-/**
  * Heavy actor, use sparsely, i.e. one instance per VM
  *
  * since Oct 17, 2016
  */
 class OServerActor(config: Config) extends Actor with ActorLogging {
   import OServerActor._
-  import OServerActorMessages._
 
   private val server: OServer = OServerMain.create
 
   val orientDbHome = config.getString(homeKey)
   val orientDbNodeName = config.getString(nodeNameKey)
+  val distributed = config.getBoolean(distributedKey)
 
   val configFile: Try[String] = {
     try {
@@ -86,10 +84,12 @@ class OServerActor(config: Config) extends Actor with ActorLogging {
 
   override def preStart {
     //update ENV vars, needed by OrientdbServer
-    log.debug("Setting ORIENTDB_HOME to" + orientDbHome)
+    log.info(s"Setting ORIENTDB_HOME to $orientDbHome")
     System.setProperty("ORIENTDB_HOME", orientDbHome)
-    log.debug("Setting ORIENTDB_NODE_NAME to " + orientDbNodeName)
+    log.info(s"Setting ORIENTDB_NODE_NAME to $orientDbNodeName")
     System.setProperty("ORIENTDB_NODE_NAME", orientDbNodeName)
+    log.info(s"Setting 'distributed' to $distributed")
+    System.setProperty("distributed", String.valueOf(distributed))
     configFile match {
       case Success(config) => {
         log.info("Starting up OrientDB '{}' as embedded instance...", orientDbNodeName)
@@ -120,6 +120,9 @@ class OServerActor(config: Config) extends Actor with ActorLogging {
     case Shutdown => {
       log.info("Shutting down '{}' embedded instance...", orientDbNodeName)
       sender ! server.shutdown()
+    }
+    case msg: Any => {
+      log.warning(s"Unexpected messaged ignored: $msg")
     }
   }
 

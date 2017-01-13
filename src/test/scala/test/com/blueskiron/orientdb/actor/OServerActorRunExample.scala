@@ -1,7 +1,6 @@
 package test.com.blueskiron.orientdb.actor
 
 import com.blueskiron.orientdb.actor._
-import com.blueskiron.orientdb.actor.OServerActorMessages._
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
 
@@ -17,7 +16,8 @@ object OServerActorRunExample extends App {
   val config = ConfigFactory.load
   val sys = ActorSystem("example-system", config.getConfig("server"))
   val props = Props(classOf[OServerActor], config.getConfig("orientdb-actor"))
-  val server = sys.actorOf(props, name = "OServerActor")
+  val oServerActorName = config.getConfig("orientdb-actor").getString(OServerActor.nodeNameKey) //also an actor name
+  val server = sys.actorOf(props, name = oServerActorName)
 
   val serverWatch = sys.actorOf(Props(classOf[OServerActorWatch]), name = "OServerActorWatch")
 
