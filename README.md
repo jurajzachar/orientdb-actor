@@ -3,7 +3,7 @@
 AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Embedded-Server.html) 
 ===========================================================
 
-> See project/Build.scala for OrientDb version used.
+> See project/Dependencies.scala for OrientDb version used.
 
 1. Create application.conf
 --------------------------
@@ -22,15 +22,40 @@ AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Em
 	private lazy val props = Props(classOf[ServerActor], config.getConfig("orientdb-embedded"))
 	private lazy val server = sys.actorOf(props, name = "odbService")
 
-3. Query server
----------------
+3. Send messages to the actor
+-----------------------------
+
+	/**
+   	 * start up embedded server
+   	 *
+   	*/
+	case object StartUp
+	case class StartUp(status: ServerStatus, failure: Option[Throwable]) extends OServerActorMessage(status.orientDbNodeName)
 	
+	/**
+   	 * check if the embedded server is active
+   	 *
+   	 */
+  	case object ServerStatus
+  	case class ServerStatus(override val orientDbNodeName: String, isActive: Boolean) extends 			 OServerActorMessage(orientDbNodeName)
+	
+	/**
+   	 * shutdowns embedded server
+   	 *
+   	 */
+  	case object Shutdown
+  	case class Shutdown(status: ServerStatus) extends OServerActorMessage(status.orientDbNodeName)
+
+  	/**
+   	 * lists available databases
+   	 */
+  	case object ListDatabases
+  	case class ListDatabases(override val orientDbNodeName: String, result: Map[String, String]) extends OServerActorMessage(orientDbNodeName)
 	server ! IsActive //sends back boolean
 	val databases = Await.result(server ? ListDatabases, timeout.duration).asInstanceOf[Map[String, String]]
   	
 TO-DO
 -----
 
-* support for other queries
-* expose info for jmx beans
+* support for other queries/admin operations
   	
