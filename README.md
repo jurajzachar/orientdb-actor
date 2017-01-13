@@ -37,7 +37,7 @@ AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Em
    	 *
    	 */
   	case object ServerStatus
-  	case class ServerStatus(override val orientDbNodeName: String, isActive: Boolean) extends 			 OServerActorMessage(orientDbNodeName)
+  	case class ServerStatus(override val orientDbNodeName: String, isActive: Boolean) extends OServerActorMessage(orientDbNodeName)
 	
 	/**
    	 * shutdowns embedded server
