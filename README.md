@@ -51,9 +51,7 @@ AKKA actor-controlled [Embedded OrientDB Server](http://orientdb.com/docs/2.1/Em
    	 */
   	case object ListDatabases
   	case class ListDatabases(override val orientDbNodeName: String, result: Map[String, String]) extends OServerActorMessage(orientDbNodeName)
-	server ! IsActive //sends back boolean
-	val databases = Await.result(server ? ListDatabases, timeout.duration).asInstanceOf[Map[String, String]]
-  	
+
 TO-DO
 -----
 
